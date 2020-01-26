@@ -17,8 +17,9 @@ public class SpotifyController{
     final static private String SPOTIFY_CLIENT_ID     = "c57cfc910044475ea429a1033ea51a9e"; // Dummy account
     final static private String SPOTIFY_CLIENT_SECRET = "2c02603fbff749948a2bbc758ac46d7c";
     
-    public static ArrayList getPlaylist(String playlistNameQuery){
+    public static Playlist getPlaylist(String playlistNameQuery){
         
+        Playlist current = new Playlist();
         ArrayList<Track> tracks = new ArrayList();
         try{
             String endpoint = "https://api.spotify.com/v1/search";
@@ -30,6 +31,7 @@ public class SpotifyController{
             JsonObject playlists = root.get("playlists").getAsJsonObject();
             JsonArray items = playlists.get("items").getAsJsonArray();
             JsonObject tracksObj = items.get(0).getAsJsonObject();
+            current.setName(tracksObj.get("name").getAsString());
             
             String tracksRef = tracksObj.get("href").getAsString();
 //            System.out.println(tracksRef);
@@ -58,7 +60,8 @@ public class SpotifyController{
         catch(Exception e){
             System.out.println("Getting weather tracks went wrong.");
         }
-        return tracks;
+        current.setTracks(tracks);
+        return current;
     }
         
     public static String getArtistId(String artistNameQuery)

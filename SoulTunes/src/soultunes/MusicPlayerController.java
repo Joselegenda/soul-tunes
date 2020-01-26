@@ -35,6 +35,7 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
@@ -97,6 +98,7 @@ public class MusicPlayerController implements Initializable {
     Button lastPlayButtonPressed = null;
     ArrayList<Album> albums = null;
     int currentAlbumIndex = 0;
+    WeatherType weather;
     
     
     public void shutdown(){
@@ -179,13 +181,19 @@ public class MusicPlayerController implements Initializable {
     @FXML
     private void playWeatherMusic(ActionEvent event){
         // Process the weather term and turn it into an emotion.
-        String emotion = "angry";
+        // Here we use faked inputs since we didn't have access to the API we wanted.
         
+        // Test weather (in reality, it would depend on the current weather)
+       
         lastPlayButtonPressed = genPlayButton;
+        
         // Call method to get playlist tracks. Extract array of tracks
-        ArrayList<Track> tracks = SpotifyController.getPlaylist(emotion);
+        String emotion = weather.getMood();
+        Playlist playlist = SpotifyController.getPlaylist(emotion);
+        artistLabel.setText(playlist.getName());
+        ArrayList<Track> tracks = playlist.getTracks();
+        
         // Play one track after the other.
-
         Iterator itr = tracks.iterator();
         playWeatherMusic(itr);
     }
@@ -236,16 +244,20 @@ public class MusicPlayerController implements Initializable {
     private void playWeatherMusic(Iterator itr){ 
         lastPlayButtonPressed.setText("Pause");
         
+        Track current = (Track) itr.next();
+        
         // If a song is already playing, stop it and play the new song
         if(mediaPlayer != null){
             stopMusic();
         }
         
+        albumLabel.setText(current.getTitle());
+        
         trackSlider.setDisable(false);
         genPlayButton.setDisable(false);
         genPlayButton.setText("Pause");
         
-        mediaPlayer = new MediaPlayer(new Media(((Track)itr.next()).getUrl()));
+        mediaPlayer = new MediaPlayer(new Media(current.getUrl()));
         mediaPlayer.setOnReady(() -> {
             mediaPlayer.play();
             isSliderAnimationActive = true;
@@ -506,19 +518,63 @@ public class MusicPlayerController implements Initializable {
                 searchField.requestFocus();
             }
         });
-        
-//        weatherStatus.setImage(new Image(new File("./assets/snowy.gif").toURI().toString()));
-//        weatherStatus.setOpacity(0.8);
-//        weatherStatus.setScaleX(1.2);
-//        weatherStatus.setScaleY(1.05);
-//        weatherStatus.toBack();
-
-        pane.setBackground(new Background(
+        String liveWeather = OpenWeatherController.getWeatherLive().toLowerCase();
+        System.out.println(liveWeather);
+        switch(liveWeather){
+            case "rain": case "drizzle": weather = WeatherType.RAINY;break;
+            case "thunderstorm": weather = WeatherType.THUNDERSTORM;break;
+            case "clear": weather = WeatherType.SUNNY;break;
+            case "snow": weather = WeatherType.SNOWY;break;
+            case "clouds": weather = WeatherType.CLOUDY;break;
+            case "fog": case "mist": case "haze": weather = WeatherType.FOGGY;break;
+            default: weather = WeatherType.SNOWY;
+        }
+        weatherInfo.setText("Weather in "+OpenWeatherController.getLocation()+": "+liveWeather.toUpperCase());
+        switch(weather){
+            case SUNNY: pane.setBackground(new Background(
+                            new BackgroundImage(new Image(new File("./assets/sunny.gif").toURI().toString()), 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundPosition.DEFAULT,
+                                                BackgroundSize.DEFAULT)));weatherInfo.setTextFill(Color.web("#FFFFFF"));break;
+            case RAINY: pane.setBackground(new Background(
+                            new BackgroundImage(new Image(new File("./assets/rain.gif").toURI().toString()), 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundPosition.DEFAULT,
+                                                BackgroundSize.DEFAULT)));weatherInfo.setTextFill(Color.web("#FFFFFF"));break;
+            case THUNDERSTORM: pane.setBackground(new Background(
+                            new BackgroundImage(new Image(new File("./assets/thunder.gif").toURI().toString()), 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundPosition.DEFAULT,
+                                                BackgroundSize.DEFAULT)));weatherInfo.setTextFill(Color.web("#FFFFFF"));break;
+            case CLOUDY: pane.setBackground(new Background(
+                            new BackgroundImage(new Image(new File("./assets/clouds.gif").toURI().toString()), 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundPosition.DEFAULT,
+                                                BackgroundSize.DEFAULT)));weatherInfo.setTextFill(Color.web("#000000"));break;
+            case SNOWY: pane.setBackground(new Background(
+                            new BackgroundImage(new Image(new File("./assets/snowy.gif").toURI().toString()), 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundPosition.DEFAULT,
+                                                BackgroundSize.DEFAULT)));weatherInfo.setTextFill(Color.web("#FFFFFF"));break;
+            case FOGGY: pane.setBackground(new Background(
+                            new BackgroundImage(new Image(new File("./assets/fog.gif").toURI().toString()), 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundPosition.DEFAULT,
+                                                BackgroundSize.DEFAULT)));weatherInfo.setTextFill(Color.web("#000000"));break;
+            default: pane.setBackground(new Background(
                             new BackgroundImage(new Image(new File("./assets/snowy.gif").toURI().toString()), 
                                                 BackgroundRepeat.ROUND, 
                                                 BackgroundRepeat.ROUND, 
                                                 BackgroundPosition.DEFAULT,
                                                 BackgroundSize.DEFAULT)));
+        }
+       
         previousAlbumButton.toFront();
         nextAlbumButton.toFront();
         genPlayButton.toFront();
