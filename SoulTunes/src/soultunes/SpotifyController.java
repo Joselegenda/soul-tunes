@@ -17,6 +17,50 @@ public class SpotifyController{
     final static private String SPOTIFY_CLIENT_ID     = "c57cfc910044475ea429a1033ea51a9e"; // Dummy account
     final static private String SPOTIFY_CLIENT_SECRET = "2c02603fbff749948a2bbc758ac46d7c";
     
+    public static ArrayList getPlaylist(String playlistNameQuery){
+        
+        ArrayList<Track> tracks = new ArrayList();
+        try{
+            String endpoint = "https://api.spotify.com/v1/search";
+            String params = "type=playlist&q=" + playlistNameQuery;
+            String jsonOutput = spotifyEndpointToJson(endpoint, params);
+//            System.out.println(jsonOutput);
+            
+            JsonObject root = new JsonParser().parse(jsonOutput).getAsJsonObject();
+            JsonObject playlists = root.get("playlists").getAsJsonObject();
+            JsonArray items = playlists.get("items").getAsJsonArray();
+            JsonObject tracksObj = items.get(0).getAsJsonObject();
+            
+            String tracksRef = tracksObj.get("href").getAsString();
+//            System.out.println(tracksRef);
+            jsonOutput = spotifyEndpointToJson(tracksRef, "");
+//            System.out.println(jsonOutput);
+
+            root = new JsonParser().parse(jsonOutput).getAsJsonObject();
+            tracksObj = root.get("tracks").getAsJsonObject();
+            items = tracksObj.get("items").getAsJsonArray();
+            
+            for(int i=0; i < items.size(); i++){
+                JsonObject trackInfo = items.get(i).getAsJsonObject();
+                JsonObject song = trackInfo.get("track").getAsJsonObject();
+                int trackNumber = song.get("track_number").getAsInt();
+                String trackTitle = song.get("name").getAsString();
+                int trackDuration = song.get("duration_ms").getAsInt();
+                String trackUrl;
+                if (song.get("preview_url").isJsonNull() == false)
+                {
+                    trackUrl = song.get("preview_url").getAsString();
+                    Track track = new Track(trackNumber, trackTitle, trackDuration, trackUrl);
+                    tracks.add(track);
+                } 
+            }
+        }
+        catch(Exception e){
+            System.out.println("Getting weather tracks went wrong.");
+        }
+        return tracks;
+    }
+        
     public static String getArtistId(String artistNameQuery)
     {
         String artistId = "";
@@ -274,7 +318,7 @@ public class SpotifyController{
                 jsonOutput += inputLine;
             }
             in.close();
-            
+//            System.out.println(jsonOutput);
             return jsonOutput;
         }
         catch(Exception e)

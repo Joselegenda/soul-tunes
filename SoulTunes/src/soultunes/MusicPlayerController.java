@@ -6,8 +6,10 @@
 package soultunes;
 
 import com.sun.javafx.collections.ObservableListWrapper;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,6 +27,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Callback;
@@ -67,6 +75,18 @@ public class MusicPlayerController implements Initializable {
     
     @FXML 
     ProgressIndicator progress;
+    
+    @FXML
+    Button playWeatherTuneButton;
+    
+    @FXML
+    Label weatherInfo;
+    
+    @FXML
+    ImageView weatherStatus;
+    
+    @FXML
+    AnchorPane pane;
     
     // Other Fields...
     ScheduledExecutorService sliderExecutor = null;
@@ -157,6 +177,20 @@ public class MusicPlayerController implements Initializable {
     }
     
     @FXML
+    private void playWeatherMusic(ActionEvent event){
+        // Process the weather term and turn it into an emotion.
+        String emotion = "angry";
+        
+        lastPlayButtonPressed = genPlayButton;
+        // Call method to get playlist tracks. Extract array of tracks
+        ArrayList<Track> tracks = SpotifyController.getPlaylist(emotion);
+        // Play one track after the other.
+
+        Iterator itr = tracks.iterator();
+        playWeatherMusic(itr);
+    }
+    
+    @FXML
     private void nextAlbum(ActionEvent event){
         displayAlbum(++currentAlbumIndex);
     }
@@ -196,6 +230,39 @@ public class MusicPlayerController implements Initializable {
                     lastPlayButtonPressed.setText("Play");
                 }
             });
+        });
+    }
+    
+    private void playWeatherMusic(Iterator itr){ 
+        lastPlayButtonPressed.setText("Pause");
+        
+        // If a song is already playing, stop it and play the new song
+        if(mediaPlayer != null){
+            stopMusic();
+        }
+        
+        trackSlider.setDisable(false);
+        genPlayButton.setDisable(false);
+        genPlayButton.setText("Pause");
+        
+        mediaPlayer = new MediaPlayer(new Media(((Track)itr.next()).getUrl()));
+        mediaPlayer.setOnReady(() -> {
+            mediaPlayer.play();
+            isSliderAnimationActive = true;
+            trackSlider.setValue(0);
+            trackSlider.setMax(30.0);
+            
+            mediaPlayer.setOnEndOfMedia(new Runnable(){
+            @Override
+            public void run() {
+                mediaPlayer.pause();
+                mediaPlayer.seek(Duration.ZERO);
+                if(itr.hasNext()){
+                    playWeatherMusic(itr);
+                }
+            }
+            
+        });
         });
     }
 
@@ -259,6 +326,7 @@ public class MusicPlayerController implements Initializable {
             artistLabel.setText(album.getArtistName());
             albumLabel.setText(album.getAlbumName());
             albumCover.setImage(new Image(album.getImageURL()));
+            albumCover.toFront();
             
             if(albums.size() > 1){
                 if(albumNumber == albums.size() - 1){
@@ -376,6 +444,7 @@ public class MusicPlayerController implements Initializable {
         };
         playColumn.setCellFactory(cellFactory);
         tracksTableView.getColumns().setAll(trackNumberColumn, trackTitleColumn, playColumn);
+        tracksTableView.toFront();
 
         trackSlider.setOnMouseReleased(new EventHandler() {
             @Override
@@ -437,6 +506,28 @@ public class MusicPlayerController implements Initializable {
                 searchField.requestFocus();
             }
         });
+        
+//        weatherStatus.setImage(new Image(new File("./assets/snowy.gif").toURI().toString()));
+//        weatherStatus.setOpacity(0.8);
+//        weatherStatus.setScaleX(1.2);
+//        weatherStatus.setScaleY(1.05);
+//        weatherStatus.toBack();
+
+        pane.setBackground(new Background(
+                            new BackgroundImage(new Image(new File("./assets/snowy.gif").toURI().toString()), 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundRepeat.ROUND, 
+                                                BackgroundPosition.DEFAULT,
+                                                BackgroundSize.DEFAULT)));
+        previousAlbumButton.toFront();
+        nextAlbumButton.toFront();
+        genPlayButton.toFront();
+        searchField.toFront();
+        playWeatherTuneButton.toFront();
+        trackSlider.toFront();
+        
+                
+        // TO DO: Get info from weather api. Display current weather info.
         
     }        
 }

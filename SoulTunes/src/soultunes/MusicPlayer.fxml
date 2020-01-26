@@ -12,24 +12,24 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="426.0" prefWidth="629.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="soultunes.MusicPlayerController">
+<AnchorPane id="AnchorPane" fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="426.0" prefWidth="629.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="soultunes.MusicPlayerController">
     <children>
       <Slider fx:id="trackSlider" disable="true" layoutX="77.0" layoutY="392.0" max="30.0" prefHeight="14.0" prefWidth="458.0" />
-      <ImageView fx:id="albumCover" fitHeight="256.0" fitWidth="256.0" layoutX="14.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="albumCover" fitHeight="135.0" fitWidth="136.0" layoutX="132.0" layoutY="117.0" pickOnBounds="true" preserveRatio="true" translateZ="1.0" />
       <TableView fx:id="tracksTableView" layoutX="277.0" layoutY="149.0" prefHeight="224.0" prefWidth="342.0">
         <columns>
           <TableColumn maxWidth="30.0" prefWidth="28.0" resizable="false" text="#" />
           <TableColumn maxWidth="500.0" minWidth="50.0" prefWidth="313.0" text="Title" />
         </columns>
       </TableView>
-      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="107.0" layoutX="14.0" layoutY="5.0" stroke="BLACK" strokeType="INSIDE" width="606.0" />
-      <Label fx:id="artistLabel" layoutX="22.0" layoutY="14.0" prefHeight="53.0" prefWidth="458.0">
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff00" height="107.0" layoutX="14.0" layoutY="5.0" stroke="WHITE" strokeType="INSIDE" width="606.0" />
+      <Label fx:id="artistLabel" layoutX="26.0" layoutY="25.0" prefHeight="53.0" prefWidth="458.0" textFill="WHITE">
          <font>
             <Font name="System Bold" size="36.0" />
          </font>
       </Label>
       <ProgressIndicator fx:id="progress" layoutX="520.0" layoutY="25.0" prefHeight="77.0" prefWidth="99.0" visible="false" />
-      <Label fx:id="albumLabel" layoutX="22.0" layoutY="67.0" prefHeight="27.0" prefWidth="465.0" textFill="#000000a9">
+      <Label fx:id="albumLabel" layoutX="29.0" layoutY="67.0" prefHeight="27.0" prefWidth="458.0" textFill="#bbbbbba8">
          <font>
             <Font size="18.0" />
          </font>
@@ -40,5 +40,7 @@
       <Button fx:id="genPlayButton" layoutX="14.0" layoutY="386.0" mnemonicParsing="false" onAction="#playPauseMusic" prefHeight="25.0" prefWidth="52.0" text="Play" />
       <Label fx:id="songTimeLabel" alignment="CENTER_RIGHT" layoutX="536.0" layoutY="391.0" prefHeight="17.0" prefWidth="30.0" text="0:00" />
       <Label fx:id="songLengthLabel" layoutX="571.0" layoutY="391.0" prefHeight="17.0" prefWidth="45.0" text="/ 0:00" />
+      <ImageView fx:id="weatherStatus" fitHeight="305.0" fitWidth="598.0" layoutX="19.0" layoutY="113.0" pickOnBounds="true" preserveRatio="true" />
+      <Button fx:id="playWeatherTuneButton" layoutX="27.0" layoutY="339.0" mnemonicParsing="false" onAction="#playWeatherMusic" prefHeight="27.0" prefWidth="235.0" text="Play Current Weather Playlist" />
     </children>
 </AnchorPane>
