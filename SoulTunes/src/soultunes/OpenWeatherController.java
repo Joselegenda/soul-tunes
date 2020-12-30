@@ -19,7 +19,7 @@ import java.net.URLConnection;
  */
 public class OpenWeatherController {
     // Location is hard coded, as proof of concept. 
-    private static String CITY_CODE = "Chicago,USA";
+    private static String CITY_CODE = "Caracas,VEN";
     private static final String APPID = "7feeb2474eb1d9e7b07ddfeea727524d";
     
     private static String getJson(){
